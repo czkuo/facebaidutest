@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <!-- 1.引入外部Properties配置文件 这样以后要使用属性文件中的资源时，可以使用${属性名}来获得 -->
+    <!--引入数据库连接配置文件-->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!--要是有多个配置文件，只需在这里继续添加即可 -->
+                <value>classpath:datasource.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--2.常用数据源的配置 start-->
+    <!-- Mysql版 dbcp数据源配置 需要引入dbcp的jar包-->
+    <!--<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">-->
+        <!--<property name="driverClassName" value="${jdbc.oracle.driver}"></property>-->
+        <!--<property name="url" value="${jdbc.oracle.url}"></property>-->
+        <!--<property name="username" value="${jdbc.oracle.username}"></property>-->
+        <!--<property name="password" value="${jdbc.oracle.password}"></property>-->
+        <!--<property name="initialSize" value="${initialSize}"></property>&lt;!&ndash; 初始化连接大小 &ndash;&gt;-->
+        <!--<property name="maxActive" value="${maxActive}"></property>&lt;!&ndash; 连接池最大数量 &ndash;&gt;-->
+        <!--<property name="maxIdle" value="${maxIdle}"></property>&lt;!&ndash; 连接池最大空闲 &ndash;&gt;-->
+        <!--<property name="minIdle" value="${minIdle}"></property>&lt;!&ndash; 连接池最小空闲 &ndash;&gt;-->
+        <!--<property name="maxWait" value="${maxWait}"></property>&lt;!&ndash; 获取连接最大等待时间 &ndash;&gt;-->
+    <!--</bean>-->
+
+    <!--c3p0数据源，跟第一种一个类型，需加入c3p0.jar包-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+    <property name="driverClass" value="${jdbc.oracle.driver}" />  <!--数据库连接驱动-->
+    <property name="jdbcUrl" value="${jdbc.oracle.url}" />     <!--数据库地址-->
+    <property name="user" value="${jdbc.oracle.username}" />   <!--用户名-->
+    <property name="password" value="${jdbc.oracle.password}" />   <!--密码-->
+    <property name="maxPoolSize" value="40" />      <!--最大连接数-->
+    <property name="minPoolSize" value="1" />       <!--最小连接数-->
+    <property name="initialPoolSize" value="10" />      <!--初始化连接池内的数据库连接-->
+    <property name="maxIdleTime" value="20" />  <!--最大空闲时间-->
+    </bean>
+
+    <!--druid 数据源-->
+    <!--<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">-->
+    <!--<property name="driverClassName" value="${jdbc.oracle.driver}" />-->
+    <!--<property name="url" value="${jdbc.oracle.url}" />-->
+    <!--<property name="username" value="${jdbc.oracle.username}" />-->
+    <!--<property name="password" value="${jdbc.oracle.password}" />-->
+    <!--&lt;!&ndash; 配置监控统计拦截的filters &ndash;&gt;-->
+    <!--<property name="filters" value="stat" />-->
+    <!--&lt;!&ndash; 配置初始化大小、最小、最大 &ndash;&gt;-->
+    <!--<property name="maxActive" value="20" />-->
+    <!--<property name="initialSize" value="1" />-->
+    <!--<property name="minIdle" value="1" />-->
+    <!--&lt;!&ndash; 配置获取连接等待超时的时间 &ndash;&gt;-->
+    <!--<property name="maxWait" value="60000" />-->
+    <!--&lt;!&ndash; 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 &ndash;&gt;-->
+    <!--<property name="timeBetweenEvictionRunsMillis" value="60000" />-->
+    <!--&lt;!&ndash; 配置一个连接在池中最小生存的时间，单位是毫秒 &ndash;&gt;-->
+    <!--<property name="minEvictableIdleTimeMillis" value="300000" />-->
+    <!--<property name="testWhileIdle" value="true" />-->
+    <!--<property name="testOnBorrow" value="false" />-->
+    <!--<property name="testOnReturn" value="false" />-->
+    <!--&lt;!&ndash; 打开PSCache，并且指定每个连接上PSCache的大小 &ndash;&gt;-->
+    <!--<property name="poolPreparedStatements" value="true" />-->
+    <!--<property name="maxOpenPreparedStatements" value="20" />-->
+    <!--</bean>-->
+
+    <!--JNDI数据源，配置在高性能的应用服务器,主要的作用是把和数据库相关的配置转移到服务器中，这样更换数据库的时候就不用更换程序中的jar包和配置文件（如WebLogic、WebSphere等）
+    java:comp/env/为固定写法 不添加也可以
+    jdbc/bbt表示的是在context.xml文件中配置的数据源的name值 或者在weblogic中配置的JNDI数据源的名称
+    1.tomcat中配置JNDI数据源在conf目录下修改context.xml配置文件
+    <Resource
+		auth="Container"
+		driverClassName="oracle.jdbc.OracleDriver"
+		factory="com.faf.jotm.DataSourceFactory"      c3p0：org.apache.naming.factory.BeanFactory dbcp：org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory
+		maxActive="20"
+		maxIdle="10"
+		maxWait="-1"
+		name="jdbc/cpf/iaf"
+		username="icf"
+		password="icf"
+		type="javax.sql.DataSource" 引用dbcp第三方数据源：org.apache.commons.dbcp.BasicDataSource  引用c3p0第三方数据源：com.mchange.v2.c3p0.ComboPooledDataSource
+		url="jdbc:oracle:thin:@10.9.230.141:1521:afuat"  />
+	2.WebLogic在控制台直接配置数据源 JNDINAME为 jndi-name的值
+    -->
+    <!--<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">-->
+    <!--<property name="jndiName" value="java:comp/env/jdbc/bbt"/>-->
+    <!--</bean>-->
+    <!--从spring2.0开始提供jee命名空间，可以简化配置如下-->
+    <!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/bbt"/>-->
+    <!--end-->
+    <!--常用数据源的配置 end-->
+
+    <!--4.配置会话工厂-->
+    <!-- 在基本的 MyBatis 中,session 工厂可以使用 SqlSessionFactoryBuilder 来创建。而在 MyBatis-Spring 中,则使用 SqlSessionFactoryBean 来替代 -->
+    <!-- 让spring管理sqlsessionfactory 使用mybatis和spring整合包中的 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!--mybatis的全局配置文件-->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <!--加载mapper.xml配置文件-->
+        <property name="mapperLocations" value ="classpath:mapper/*.xml"/>
+    </bean>
+
+    <!-- 配置mapper扫描器 扫描dao层接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 -->
+        <property name="basePackage" value="com.face.dao"></property>
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/jee
+       http://www.springframework.org/schema/jee/spring-jee.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 组件扫描在spring IoC容器中注册为bean 扫描base-package 包下的注释了@Repository，@Service，@Controller注解的类 -->
+    <!-- 按照dao service controller 的顺序进行扫描注册 -->
+    <context:component-scan base-package="com.face.dao"/>
+    <context:component-scan base-package="com.face.bizz"/>
+    <context:component-scan base-package="com.face.rest"/>
+
+    <!--引入dao层配置-->
+    <import resource="classpath:applicationContext-dao.xml" />
+
+    <!--引入事务配置-->
+    <import resource="classpath:applicationContext-transaction.xml" />
+</beans>

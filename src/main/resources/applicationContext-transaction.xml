@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+
+
+    <!--5.spring-jdbc.jar MyBatis事务管理器的配置 -->
+    <bean id="TransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!--.使用注解的方式开启事务 此时只需要在需要开启事务的方法上加上@Transactional注解即可 transaction-manager指定的是上面配置的事务管理器的id-->
+    <!--事务注解驱动，标注@Transactional的类和方法将具有事务性-->
+    <tx:annotation-driven transaction-manager="TransactionManager"/>
+
+</beans>
